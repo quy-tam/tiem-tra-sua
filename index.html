@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống Trà Sữa MilkTea 2000s</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #7fb069; 
+            --secondary-color: #ff9a8b; 
+            --dark-text: #2d3436;
+        }
+
+        body { font-family: 'Be Vietnam Pro', sans-serif; color: var(--dark-text); scroll-behavior: smooth; background: #fdfaf7; }
+        
+        /* --- CSS GIAO DIỆN GỐC (CODE 1) --- */
+        .hero {
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), 
+                        url('https://statics.vinwonders.com/Vietnamese-Milk-Tea-2_1701613025.jpg');
+            background-size: cover; background-position: center; height: 75vh;
+            display: flex; align-items: center; color: white;
+        }
+
+        .product-card {
+            border: none; border-radius: 20px; overflow: hidden;
+            transition: all 0.3s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            cursor: pointer; height: 100%; background: white;
+        }
+        .product-card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
+        .product-img { height: 180px; object-fit: cover; width: 100%; }
+        .price-tag { color: var(--primary-color); font-weight: bold; font-size: 1.1rem; }
+
+        .about-section { background-color: #fff9f0; padding: 60px 0; }
+
+        .section-title { position: relative; margin-bottom: 40px; font-weight: 700; text-align: center;}
+        .section-title::after {
+            content: ''; width: 60px; height: 4px; background: var(--primary-color);
+            position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%);
+        }
+        .btn-primary { background-color: var(--primary-color); border: none; padding: 10px 25px; border-radius: 50px; }
+        .btn-primary:hover { background-color: #6c9856; }
+
+        /* GIỎ HÀNG SIDEBAR (CODE 1) */
+        #cart-sidebar {
+            position: fixed; right: -400px; top: 0; width: 350px; height: 100%;
+            background: white; z-index: 2050; transition: 0.3s; padding: 25px;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.1); display: flex; flex-direction: column;
+        }
+        #cart-sidebar.active { right: 0; }
+        
+        /* NÚT ADMIN (CODE 1) */
+       
+        .admin-toggle-btn {
+            background: #2d3436; color: white; border-radius: 50%; width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center; border: none; transition: 0.3s;
+        }
+        .admin-toggle-btn:hover { background: #000; transform: rotate(45deg); }
+
+        /* KHU VỰC ADMIN GIAO DIỆN MỚI CHO PHÙ HỢP LOGIC CODE 2 */
+        .admin-container {
+            display: none; background: white; border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08); padding: 30px; margin-top: 30px; margin-bottom: 50px;
+        }
+        .stat-card {
+            background: #f4f9f1; border-left: 5px solid var(--primary-color);
+            padding: 15px; border-radius: 10px; margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    
+    <nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-success" href="#" onclick="showPage('home')">MilkTea<span class="text-warning">2000s</span></a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto text-uppercase small fw-bold align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="#" onclick="showPage('home')">Trang chủ</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#menu">Menu  </a></li>
+                    <li class="nav-item"><a class="nav-link" href="#about">Câu chuyện</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link text-success" href="javascript:void(0)" onclick="toggleCart()">
+                            <i class="fas fa-shopping-basket"></i> Giỏ hàng (<span id="cart-count">0</span>)
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item ms-lg-3">
+                        <button class="admin-toggle-btn" onclick="showPage('login')" title="Quản trị viên">
+                            <i class="fas fa-user-cog"></i>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div id="home-page">
+        <section class="hero text-center">
+            <div class="container">
+                <h1 class="display-3 fw-bold mb-3">Trà Sữa Đậm Vị - <br>Tươi Mới Mỗi Ngày</h1>
+                <p class="fs-5 mb-4">Hương vị trà truyền thống thơm ngon  </p>
+                <a href="#menu" class="btn btn-primary btn-lg">Xem Menu Ngay</a>
+            </div>
+        </section>
+
+        <section id="menu" class="container py-5">
+            <h2 class="section-title">Món Ngon MilkTea 2000s</h2>
+            <div class="row g-4" id="menuGrid"></div>
+        </section>
+
+        <section id="about" class="about-section">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-md-6 mb-4 mb-md-0">
+                        <img src="https://statics.vinwonders.com/Vietnamese-Milk-Tea-2_1701613025.jpg" class="img-fluid rounded-4 shadow" alt="Our Story">
+                    </div>
+                    <div class="col-md-6 ps-md-5">
+                        <h2 class="fw-bold mb-4">Câu Chuyện Của Chúng Tôi</h2>
+                        <p>Bắt đầu từ một xe trà nhỏ ven đường, chúng tôi khát khao mang đến những ly trà "thật" nhất, được làm từ những lá trà chọn lọc thủ công kết hợp cùng máy móc pha chế hiện đại.</p>
+                        <button class="btn btn-outline-success mt-3">Đọc thêm câu chuyện</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div id="login-page" class="container py-5" style="display: none; max-width: 400px;">
+        <div class="card p-4 shadow-sm border-0 rounded-4 text-center">
+            <h3 class="fw-bold mb-3"><i class="fas fa-lock text-success"></i> Đăng nhập Admin</h3>
+            <p class="text-muted small">Vui lòng nhập mật khẩu quản lý để tiếp tục</p>
+            <input type="password" id="adminPassword" class="form-control mb-3" placeholder="Mật khẩu (Gợi ý: 1234)">
+            <button class="btn btn-success w-100 mb-2" onclick="handleLogin()">Xác nhận</button>
+            <button class="btn btn-light w-100" onclick="showPage('home')">Quay lại</button>
+        </div>
+    </div>
+
+    <div id="admin-page" class="container py-5" style="display: none;">
+        <div class="admin-container d-block">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="fw-bold m-0"><i class="fas fa-chart-line text-success"></i> Hệ Thống Quản Trị</h3>
+                <button class="btn btn-outline-secondary btn-sm" onclick="showPage('home')">Thoát Admin</button>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <h5 class="fw-bold mb-3">📊 Báo Cáo Kinh Doanh</h5>
+                    <div id="statsArea"></div>
+                </div>
+
+                <div class="col-md-8">
+                    <h5 class="fw-bold mb-3">➕ Thêm món mới vào Menu</h5>
+                    <div class="row g-2">
+                        <div class="col-md-4">
+                            <input id="admName" class="form-control" placeholder="Tên sản phẩm">
+                        </div>
+                        <div class="col-md-3">
+                            <input id="admPrice" type="number" class="form-control" placeholder="Giá tiền (VNĐ)">
+                        </div>
+                        <div class="col-md-5">
+                            <input id="admImg" class="form-control" placeholder="Link ảnh (Tự động tạo nếu để trống)">
+                        </div>
+                        <div class="col-12 mt-2">
+                            <button class="btn btn-success w-100" onclick="addProduct()">Thêm vào thực đơn</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="my-4">
+
+            <h5 class="fw-bold mb-3">📋 Danh sách món hiện tại</h5>
+            <div id="adminList" style="max-height: 300px; overflow-y: auto; background: #fafafa; padding: 15px; border-radius: 12px;"></div>
+        </div>
+    </div>
+    
+
+    <div id="cart-sidebar">
+        <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+            <h4 class="fw-bold mb-0">Giỏ hàng</h4>
+            <button class="btn-close" onclick="toggleCart()"></button>
+        </div>
+        <div id="cartItems" style="flex-grow: 1; overflow-y: auto;"></div>
+        <div class="border-top pt-3">
+            <h5 class="fw-bold d-flex justify-content-between">
+                <span>Tổng tiền:</span>
+                <span id="cartTotal">0</span> đ
+            </h5>
+            <button class="btn btn-primary w-100 mt-3 py-3" onclick="checkout()">ĐẶT HÀNG NGAY</button>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white py-4 text-center">
+        <p class="mb-0">© CN1  MilkTea 2000s. Địa chỉ: 123 Nguyễn Huệ, Quận 1, TP.HCM. Hotline: 1900 1234</p>
+        <p class="mb-0">© CN2  MilkTea 2000s. Địa chỉ: b7/24c4 Tân Kiên H.Bình Chánh, TP HCM. Hotline 0909 0009 </p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // === BIẾN DỮ LIỆU LOCALSTORAGE (TÍNH NĂNG CODE 2) ===
+        let drinks = JSON.parse(localStorage.getItem("pro_drinks")) || [];
+        let cart = JSON.parse(localStorage.getItem("pro_cart")) || [];
+        let orders = JSON.parse(localStorage.getItem("pro_orders")) || [];
+
+        // Khởi tạo món nếu rỗng
+        if(drinks.length === 0){
+            for(let i=1; i<=12; i++){
+                drinks.push({
+                    name: "Trà sữa Truyền thống " + i,
+                    price: 25000 + (i * 2000),
+                    img: `https://picsum.photos/seed/${i+20}/400/300`
+                });
+            }
+            save();
+        }
+
+        function save() {
+            localStorage.setItem("pro_drinks", JSON.stringify(drinks));
+            localStorage.setItem("pro_cart", JSON.stringify(cart));
+            localStorage.setItem("pro_orders", JSON.stringify(orders));
+            document.getElementById('cart-count').innerText = cart.length;
+            renderMenu();
+            renderCart();
+            renderAdminList();
+            renderStats();
+        }
+
+        // === CHUYỂN ĐỔI GIỮA CÁC TRANG (Giao diện 1 & Logic login 2) ===
+        function showPage(pageId) {
+            document.getElementById('home-page').style.display = pageId === 'home' ? 'block' : 'none';
+            document.getElementById('login-page').style.display = pageId === 'login' ? 'block' : 'none';
+            document.getElementById('admin-page').style.display = pageId === 'admin' ? 'block' : 'none';
+            
+            if(pageId === 'admin') {
+                renderAdminList();
+                renderStats();
+            }
+        }
+
+        function handleLogin() {
+            const pass = document.getElementById('adminPassword').value;
+            if(pass === "2102") {
+                document.getElementById('adminPassword').value = ""; // Xóa password sau đăng nhập
+                showPage('admin');
+            } else {
+                alert("Sai mật khẩu ");
+            }
+        }
+
+        // === MENU (GIAO DIỆN ĐẸP CODE 1) ===
+        function renderMenu() {
+            let html = "";
+            drinks.forEach((d, i) => {
+                html += `
+                <div class="col-6 col-md-3">
+                    <div class="card product-card">
+                        <img src="${d.img}" class="product-img" alt="${d.name}">
+                        <div class="card-body text-center">
+                            <h6 class="fw-bold mb-1">${d.name}</h6>
+                            <p class="price-tag mb-2">${d.price.toLocaleString()}đ</p>
+                            <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="addToCart(${i})">
+                                Thêm <i class="fas fa-plus-circle"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+            });
+            document.getElementById('menuGrid').innerHTML = html;
+        }
+
+        // === GIỎ HÀNG (SIDEBAR CODE 1) ===
+        function toggleCart() {
+            document.getElementById('cart-sidebar').classList.toggle('active');
+        }
+
+        function addToCart(index) {
+            cart.push(drinks[index]);
+            save();
+            // Mở nhẹ giỏ hàng cho người dùng biết
+            const sidebar = document.getElementById('cart-sidebar');
+            if(!sidebar.classList.contains('active')) toggleCart();
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            save();
+        }
+
+        function renderCart() {
+            let html = "";
+            let total = 0;
+            cart.forEach((item, i) => {
+                total += item.price;
+                html += `
+                <div class="d-flex align-items-center mb-3 border-bottom pb-2">
+                    <img src="${item.img}" style="width: 50px; height: 50px; object-fit: cover;" class="rounded me-3">
+                    <div class="flex-grow-1">
+                        <h6 class="mb-0 small fw-bold">${item.name}</h6>
+                        <small class="text-success">${item.price.toLocaleString()} đ</small>
+                    </div>
+                    <button class="btn btn-sm text-danger" onclick="removeFromCart(${i})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>`;
+            });
+            document.getElementById('cartItems').innerHTML = html;
+            document.getElementById('cartTotal').innerText = total.toLocaleString();
+        }
+
+        function checkout() {
+            if(cart.length === 0) return alert("Giỏ hàng của bạn đang trống!");
+
+            const orderTotal = cart.reduce((sum, item) => sum + item.price, 0);
+            orders.push({
+                time: new Date().toLocaleString(),
+                total: orderTotal,
+                itemsCount: cart.length
+            });
+
+            alert("🎉 Đặt hàng thành công! Cảm Ơn Quý Khách Đã Trải Nghiệm.");
+            cart = [];
+            save();
+            toggleCart();
+        }
+
+        // === TÍNH NĂNG QUẢN LÝ (CODE 2) ===
+        function addProduct() {
+            const name = document.getElementById('admName').value;
+            const price = parseInt(document.getElementById('admPrice').value);
+            const img = document.getElementById('admImg').value;
+
+            if(!name || !price) return alert("Vui lòng nhập tên và giá món!");
+
+            drinks.unshift({
+                name: name,
+                price: price,
+                img: img || `https://picsum.photos/seed/${Math.floor(Math.random() * 100)}/400/300`
+            });
+
+            document.getElementById('admName').value = "";
+            document.getElementById('admPrice').value = "";
+            document.getElementById('admImg').value = "";
+
+            save();
+            alert("Thêm món thành công!");
+        }
+
+        function deleteProduct(index) {
+            if(confirm("Bạn có chắc chắn muốn xóa sản phẩm này khỏi menu?")) {
+                drinks.splice(index, 1);
+                save();
+            }
+        }
+
+        function renderAdminList() {
+            let html = "";
+            drinks.forEach((d, i) => {
+                html += `
+                <div class="d-flex justify-content-between align-items-center mb-2 border-bottom pb-2">
+                    <span>${d.name} - <b class="text-success">${d.price.toLocaleString()}đ</b></span>
+                    <button class="btn btn-sm btn-danger" onclick="deleteProduct(${i})">Xóa</button>
+                </div>`;
+            });
+            document.getElementById('adminList').innerHTML = html;
+        }
+
+        function renderStats() {
+            const totalOrders = orders.length;
+            const revenue = orders.reduce((sum, ord) => sum + ord.total, 0);
+
+            document.getElementById('statsArea').innerHTML = `
+                <div class="stat-card">
+                    <h6 class="fw-bold mb-1">Số lượng đơn hàng</h6>
+                    <h4 class="text-success mb-0">${totalOrders}</h4>
+                </div>
+                <div class="stat-card">
+                    <h6 class="fw-bold mb-1">Tổng doanh thu thực tế</h6>
+                    <h4 class="text-success mb-0">${revenue.toLocaleString()} đ</h4>
+                </div>
+            `;
+        }
+
+        // Khởi động trang web
+        window.onload = () => {
+            save(); // Tự động render lần đầu
+        };
+    </script>
+     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <script>
+        // 2. Cấu hình Firebase - Đã sửa lỗi databaseURL để hiện dữ liệu
+     const firebaseConfig = { 
+  apiKey : "AIzaSyBNkPG5lHwGTBcAkw3Nuh8FmnXnFxl3sBg" , 
+  authDomain : "milktea-2000s.firebaseapp.com" , 
+  URL cơ sở dữ liệu : "https://milktea-2000s-default-rtdb.firebaseio.com" , 
+  projectId : "milktea-2000s" , 
+  storageBucket : "milktea-2000s.firebasestorage.app" , 
+  messagingSenderId : "838435577545" , 
+  appId : "1:838435577545:web:9a21ce273ef61489a23718" , 
+  measurementId : "G-V40CG1C99D" 
+};
+
+        // Khởi tạo Firebase
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // 3. Biến lưu trữ dữ liệu
+        let drinks = []; // Danh sách món từ Firebase
+        let cart = JSON.parse(localStorage.getItem("pro_cart")) || []; // Giỏ hàng lưu ở máy khách
+        let orders = []; // Danh sách đơn hàng từ Firebase
+
+        // --- A. ĐỒNG BỘ MÓN NƯỚC (ADMIN THÊM - KHÁCH THẤY) ---
+        db.ref('drinks').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                // Chuyển dữ liệu từ Firebase thành mảng để dùng trong Web
+                drinks = Object.keys(data).map(key => ({
+                    id: key,
+                    ...data[key]
+                }));
+            } else {
+                // Nếu Firebase trống, nạp 2 món mẫu
+                drinks = [
+                    { name: "Trà sữa Truyền thống", price: 25000, img: "https://picsum.photos/seed/1/400/300" },
+                    { name: "Trà Đào Cam Sả", price: 35000, img: "https://picsum.photos/seed/2/400/300" }
+                ];
+            }
+            renderMenu();
+            renderAdminList();
+        });
+
+        // --- B. ĐỒNG BỘ ĐƠN HÀNG VÀ THỐNG KÊ ---
+        db.ref('orders').on('value', (snapshot) => {
+            const data = snapshot.val();
+            orders = data ? Object.values(data) : [];
+            renderStats();
+        });
+
+        // --- C. CÁC HÀM XỬ LÝ GIAO DIỆN ---
+        function showPage(pageId) {
+            document.getElementById('home-page').style.display = pageId === 'home' ? 'block' : 'none';
+            document.getElementById('login-page').style.display = pageId === 'login' ? 'block' : 'none';
+            document.getElementById('admin-page').style.display = pageId === 'admin' ? 'block' : 'none';
+            window.scrollTo(0, 0);
+        }
+
+        function handleLogin() {
+            const pass = document.getElementById('adminPassword').value;
+            if(pass === "2102") {
+                document.getElementById('adminPassword').value = "";
+                showPage('admin');
+            } else {
+                alert("Sai mật khẩu rồi Tâm ơi!");
+            }
+        }
+
+        function renderMenu() {
+            let html = "";
+            drinks.forEach((d, i) => {
+                html += `
+                <div class="col-6 col-md-3">
+                    <div class="card product-card">
+                        <img src="${d.img}" class="product-img">
+                        <div class="card-body text-center">
+                            <h6 class="fw-bold mb-1">${d.name}</h6>
+                            <p class="price-tag mb-2">${d.price.toLocaleString()}đ</p>
+                            <button class="btn btn-sm btn-outline-success rounded-pill px-3" onclick="addToCart(${i})">
+                                Thêm <i class="fas fa-plus-circle"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+            });
+            document.getElementById('menuGrid').innerHTML = html;
+        }
+
+        // --- D. GIỎ HÀNG VÀ THANH TOÁN ---
+        function toggleCart() {
+            document.getElementById('cart-sidebar').classList.toggle('active');
+        }
+
+        function addToCart(index) {
+            cart.push(drinks[index]);
+            updateCart();
+            if(!document.getElementById('cart-sidebar').classList.contains('active')) toggleCart();
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCart();
+        }
+
+        function updateCart() {
+            localStorage.setItem("pro_cart", JSON.stringify(cart));
+            document.getElementById('cart-count').innerText = cart.length;
+            renderCart();
+        }
+
+        function renderCart() {
+            let html = "", total = 0;
+            cart.forEach((item, i) => {
+                total += item.price;
+                html += `
+                <div class="d-flex align-items-center mb-3 border-bottom pb-2">
+                    <img src="${item.img}" style="width: 45px; height: 45px; object-fit: cover;" class="rounded me-2">
+                    <div class="flex-grow-1">
+                        <h6 class="mb-0 small fw-bold">${item.name}</h6>
+                        <small class="text-success">${item.price.toLocaleString()}đ</small>
+                    </div>
+                    <button class="btn btn-sm text-danger" onclick="removeFromCart(${i})"><i class="fas fa-trash"></i></button>
+                </div>`;
+            });
+            document.getElementById('cartItems').innerHTML = html;
+            document.getElementById('cartTotal').innerText = total.toLocaleString();
+        }
+
+        function checkout() {
+            if(cart.length === 0) return alert("Giỏ hàng đang trống!");
+            const total = cart.reduce((s, i) => s + i.price, 0);
+            const orderData = {
+                time: new Date().toLocaleString(),
+                total: total,
+                items: cart.map(i => i.name).join(", ")
+            };
+            db.ref('orders').push(orderData).then(() => {
+                alert("🎉 Đã gửi đơn hàng lên hệ thống!");
+                cart = [];
+                updateCart();
+                toggleCart();
+            });
+        }
+
+        // --- E. QUẢN LÝ CHO ADMIN ---
+        function addProduct() {
+            const name = document.getElementById('admName').value;
+            const price = parseInt(document.getElementById('admPrice').value);
+            const img = document.getElementById('admImg').value || `https://picsum.photos/seed/${Math.random()}/400/300`;
+
+            if(!name || !price) return alert("Vui lòng nhập tên và giá món!");
+
+            db.ref('drinks').push({ name, price, img }).then(() => {
+                alert("Đã thêm món mới thành công!");
+                document.getElementById('admName').value = "";
+                document.getElementById('admPrice').value = "";
+                document.getElementById('admImg').value = "";
+            });
+        }
+
+        function deleteProduct(id) {
+            if(confirm("Xóa món này vĩnh viễn khỏi menu?")) {
+                db.ref('drinks/' + id).remove();
+            }
+        }
+
+        function renderAdminList() {
+            let html = "";
+            drinks.forEach((d) => {
+                html += `
+                <div class="d-flex justify-content-between align-items-center mb-2 border-bottom pb-2">
+                    <span>${d.name} - <b class="text-success">${d.price ? d.price.toLocaleString() : 0}đ</b></span>
+                    <button class="btn btn-sm btn-danger" onclick="deleteProduct('${d.id}')">Xóa</button>
+                </div>`;
+            });
+            document.getElementById('adminList').innerHTML = html;
+        }
+
+        function renderStats() {
+            const revenue = orders.reduce((sum, ord) => sum + ord.total, 0);
+            document.getElementById('statsArea').innerHTML = `
+                <div class="stat-card">
+                    <h6 class="fw-bold mb-1">Số lượng đơn</h6>
+                    <h4 class="text-success mb-0">${orders.length}</h4>
+                </div>
+                <div class="stat-card">
+                    <h6 class="fw-bold mb-1">Doanh thu</h6>
+                    <h4 class="text-success mb-0">${revenue.toLocaleString()} đ</h4>
+                </div>`;
+        }
+
+        // Chạy lần đầu khi load trang
+        window.onload = () => {
+            updateCart();
+        };
+    </script>
+</body>
+</html>
+
+
+</body>
+</html>
